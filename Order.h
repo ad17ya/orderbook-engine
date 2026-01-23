@@ -2,13 +2,15 @@
 #include <cstdint>
 #include <memory>
 
+namespace OrderBookEngine
+{
+
 enum class Side
 {
     SIDE_BUY,
     SIDE_SELL
 };
 
-class Order;
 typedef std::shared_ptr<Order> HOrder;
 
 class Order
@@ -38,4 +40,6 @@ private:
 
     HOrder prev;
     HOrder next;
+}
+
 }
