@@ -1,19 +1,18 @@
 #pragma once
-
-#include <iostream>
 #include <map>
-#include <memory>
-#include "PriceLevel.h"
+#include <unordered_map>
 
+#include "PriceLevel.h"
 namespace OrderBookEngine
 {
 
-typedef std::shared_ptr<OrderBook> HOrderBook;
-
 struct OrderBook
 {
-    std::map<double, HPriceLevel, std::greater<double>> buy_levels;
-    std::map<double, HPriceLevel> sell_levels;
-};
+    // Price -> PriceLevel
+    std::map<double, PriceLevel> BIDS;
+    std::map<double, PriceLevel> ASKS;
 
+    std::unordered_map<uint64_t, HOrder> orderIdtoOrderMap;
+};
+    
 }

@@ -1,60 +1,50 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
 #include "Order.h"
 
 namespace OrderBookEngine
 {
 
-typedef std::shared_ptr<class PriceLevel> HPriceLevel;
-
-class PriceLevel
+struct PriceLevel
 {
 public:
-    bool empty() const
+    HOrder headOrder = nullptr;
+    HOrder tailOrder = nullptr;
+
+    bool empty()
     {
-        return head_order == nullptr;
+        return headOrder == nullptr;
     }
 
-    void push_back(HOrder order)
+    void addOrder(HOrder order)
     {
-        if (empty())
-        {
-            head_order = order;
-            tail_order = order;
-        }
+        order->next = nullptr;
+        order->prev = tailOrder;
+
+        // Price level is empty
+        if (tailOrder) 
+            tailOrder->next = order;
         else
-        {
-            tail_order->setNext(order);
-            order->setPrev(tail_order);
-            tail_order = order;
-        }
+            headOrder = order;
+
+        tailOrder = order;
     }
 
-    void remove(HOrder order)
+    void removeOrder(HOrder order)
     {
-        HOrder prev = order->getPrev();
-        HOrder next = order->getNext();
-
-        if (prev)
-            prev->setNext(next);
+        if (order->prev)
+            order->prev->next = order->next;
         else
-            head_order = next;
+            headOrder = order->next;
 
-        if (next)
-            next->setPrev(prev);
+        if (order->next)
+            order->next->prev = order->prev;
         else
-            tail_order = prev;
+            tailOrder = order->prev;
 
-        order->setPrev(nullptr);
-        order->setNext(nullptr);
+        order->prev = order->next = nullptr;
     }
 
-
-private:
-    HOrder head_order;
-    HOrder tail_order;
 };
 
 
