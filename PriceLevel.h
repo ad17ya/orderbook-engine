@@ -7,7 +7,6 @@ namespace OrderBookEngine
 
 struct PriceLevel
 {
-public:
     HOrder headOrder = nullptr;
     HOrder tailOrder = nullptr;
 
