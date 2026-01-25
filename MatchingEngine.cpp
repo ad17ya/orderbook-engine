@@ -33,10 +33,21 @@ void MatchingEngine::matchOrder(HOrder order)
     }
 }
 
-void MatchingEngine::matchLevel(HOrder order, PriceLevel& level, BookType& book, IteratorType it)
+void MatchingEngine::matchLevel(HOrder incoming, PriceLevel& level, BookType& book, IteratorType it)
 {
-    while (order->getLeftOverQty() > 0 && !level.empty())
+    while (incoming->getLeftOverQty() > 0 && !level.empty())
     {
+        HOrder resting = level.headOrder;
+        uint64_t execs = std::min(incoming->getLeftOverQty(), resting->getLeftOverQty());
+
+        incoming->addExecs(execs);
+        resting->addExecs(execs);
+
+        if (resting->getLeftOverQty() == 0)
+        {
+            level.removeOrder(resting);
+            lookup.erase(resting->getOrderId());
+        }
     }
 
     if (level.empty())

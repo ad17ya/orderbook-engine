@@ -42,6 +42,7 @@ public:
     void setPrice(double price) { m_price = price; }
     void setFilledQty(uint64_t qty) { m_filledQty = qty; }
     void setLeftOverQty(uint64_t qty) { m_leftOverQty = qty; }
+    void addExecs(uint64_t execs) { m_leftOverQty -= execs; }
 
     bool isValid() const 
     { 
