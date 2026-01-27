@@ -3,8 +3,9 @@
 
 namespace OrderBookEngine
 {
-
 enum enSIDE { Buy, SELL };
+
+class Order;
 typedef std::shared_ptr<Order> HOrder;
 
 class Order
@@ -17,10 +18,10 @@ private:
     double m_price;
     enSIDE m_side;
 
+public:
     HOrder next;
     HOrder prev;
 
-public:
     Order(uint16_t orderId, uint64_t qty, double price, enSIDE side)
     : m_orderId(orderId), 
     m_qty(qty), 
