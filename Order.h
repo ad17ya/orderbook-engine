@@ -4,45 +4,22 @@
 
 namespace OrderBookEngine
 {
-enum enSIDE { Buy, Sell };
 
-class Order
+enum Side { Buy, Sell };
+
+struct Order
 {
 private:
     uint64_t m_orderId;
     uint64_t m_qty;
     uint64_t m_price;
-    enSIDE m_side;
-
-public:
+    Side m_side;
     Order* next;
     Order* prev;
 
-    Order(uint16_t orderId, uint64_t qty, uint64_t price, enSIDE side)
-    : m_orderId(orderId), 
-    m_qty(qty), 
-    m_price(price), 
-    m_side(side) {};
-
-    ~Order() {};
-
-    // write getters for all private members
-    uint64_t getOrderId() const { return m_orderId; }
-    uint64_t getQty() const { return m_qty; }
-    uint64_t getPrice() const { return m_price; }
-    enSIDE getSide() const { return m_side; }
-
-    void setPrice(uint64_t price) { m_price = price; }
-
-    bool isValid() const 
-    { 
-        return m_qty > 0 && m_price > 0; 
-    }
-
-    bool isFullyFilled() const
-    {
-        return m_filledQty == m_qty;
-    }
+    Order(uint64_t id, Side side, int64_t priceTicks, uint64_t qty) : 
+        m_orderId(id), m_side(side), m_price(priceTicks), m_qty(qty), next(nullptr), prev(nullptr) 
+    {}
 };
 
 }

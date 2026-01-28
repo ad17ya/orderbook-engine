@@ -7,15 +7,15 @@ namespace OrderBookEngine
 
 struct PriceLevel
 {
-    HOrder headOrder = nullptr;
-    HOrder tailOrder = nullptr;
+    Order* headOrder = nullptr;
+    Order* tailOrder = nullptr;
 
-    bool empty()
+    bool empty() const noexcept
     {
         return headOrder == nullptr;
     }
 
-    void addOrder(HOrder order)
+    void addOrder(Order* order) noexcept
     {
         order->next = nullptr;
         order->prev = tailOrder;
@@ -29,7 +29,7 @@ struct PriceLevel
         tailOrder = order;
     }
 
-    void removeOrder(HOrder order)
+    void removeOrder(Order* order) noexcept
     {
         if (order->prev)
             order->prev->next = order->next;

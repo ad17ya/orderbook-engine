@@ -9,15 +9,15 @@ template <typename BookType = std::map<double, PriceLevel>, typename IteratorTyp
 class MatchingEngine
 {
 private:
-    HOrderBook m_OrderBook;
-    std::unordered_map<uint64_t, HOrder> lookup; // order id to order map
+    OrderBook* m_OrderBook;
+    std::unordered_map<uint64_t, Order*> lookup; // order id to order map
 
     template<typename T, typename Iter>
-    void matchLevel(HOrder incoming, PriceLevel& level, T& book, Iter it)
+    void matchLevel(Order* incoming, PriceLevel& level, T& book, Iter it)
     {
         while (incoming->getLeftOverQty() > 0 && !level.empty())
         {
-            HOrder resting = level.headOrder;
+            Order* resting = level.headOrder;
             uint64_t execs = std::min(incoming->getLeftOverQty(), resting->getLeftOverQty());
 
             incoming->addExecs(execs);
@@ -37,7 +37,7 @@ private:
     }
 
     template<typename T>
-    void matchOrder(HOrder order, T& book)
+    void matchOrder(Order* order, T& book)
     {
         while(order->getLeftOverQty() > 0 && !book.empty())
         {
@@ -49,7 +49,7 @@ private:
         }
     }
 
-    void storeOrderToDealBook(HOrder) {};
+    void storeOrderToDealBook(Order*) {};
 
     bool isPriceMatch(enSIDE side, double marketPrice, double orderPrice)
     {
@@ -65,7 +65,7 @@ public:
         m_OrderBook = std::make_shared<OrderBook>();
     };
 
-    void onNewOrder(HOrder order)
+    void onNewOrder(Order* order)
     {
         // Invalid order
         if (!order || !order->isValid()) 
@@ -79,9 +79,9 @@ public:
         lookup.insert({order->getOrderId(), order});
         
         if (order->getSide() == enSIDE::Buy)
-            matchOrder(order, m_OrderBook->ASKS);
+            matchOrder(order, m_OrderBook->Asks);
         else
-            matchOrder(order, m_OrderBook->BIDS);
+            matchOrder(order, m_OrderBook->Bids);
 
         if (!order->isFullyFilled())
         {

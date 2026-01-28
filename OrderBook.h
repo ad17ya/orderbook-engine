@@ -11,10 +11,8 @@ namespace OrderBookEngine
 struct OrderBook
 {
     // Price -> PriceLevel
-    std::map<double, PriceLevel, std::greater<double>> BIDS;
-    std::map<double, PriceLevel, std::less<double>> ASKS;
+    std::map<uint64_t, PriceLevel, std::greater<uint64_t>> Bids;
+    std::map<uint64_t, PriceLevel, std::less<uint64_t>> Asks;
 };
-
-typedef std::shared_ptr<OrderBook> HOrderBook;
     
 }
