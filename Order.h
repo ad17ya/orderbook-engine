@@ -1,32 +1,26 @@
+#pragma once
 #include <cstdint>
 #include <memory>
 
 namespace OrderBookEngine
 {
-enum enSIDE { Buy, SELL };
-
-class Order;
-typedef std::shared_ptr<Order> HOrder;
+enum enSIDE { Buy, Sell };
 
 class Order
 {
 private:
     uint64_t m_orderId;
     uint64_t m_qty;
-    uint64_t m_filledQty;
-    uint64_t m_leftOverQty;
-    double m_price;
+    uint64_t m_price;
     enSIDE m_side;
 
 public:
-    HOrder next;
-    HOrder prev;
+    Order* next;
+    Order* prev;
 
-    Order(uint16_t orderId, uint64_t qty, double price, enSIDE side)
+    Order(uint16_t orderId, uint64_t qty, uint64_t price, enSIDE side)
     : m_orderId(orderId), 
     m_qty(qty), 
-    m_filledQty(0),
-    m_leftOverQty(qty),
     m_price(price), 
     m_side(side) {};
 
@@ -35,15 +29,10 @@ public:
     // write getters for all private members
     uint64_t getOrderId() const { return m_orderId; }
     uint64_t getQty() const { return m_qty; }
-    uint64_t getFilledQty() const { return m_filledQty; }
-    uint64_t getLeftOverQty() const { return m_leftOverQty; }
-    double getPrice() const { return m_price; }
+    uint64_t getPrice() const { return m_price; }
     enSIDE getSide() const { return m_side; }
 
-    void setPrice(double price) { m_price = price; }
-    void setFilledQty(uint64_t qty) { m_filledQty = qty; }
-    void setLeftOverQty(uint64_t qty) { m_leftOverQty = qty; }
-    void addExecs(uint64_t execs) { m_leftOverQty -= execs; }
+    void setPrice(uint64_t price) { m_price = price; }
 
     bool isValid() const 
     { 
