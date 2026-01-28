@@ -4,15 +4,12 @@
 namespace OrderBookEngine
 {
 
-template <typename BookType = std::map<double, PriceLevel>, typename IteratorType = typename BookType::iterator>
-
 class MatchingEngine
 {
 private:
     OrderBook* m_OrderBook;
     std::unordered_map<uint64_t, Order*> lookup; // order id to order map
 
-    template<typename T, typename Iter>
     void matchLevel(Order* incoming, PriceLevel& level, T& book, Iter it)
     {
         while (incoming->getLeftOverQty() > 0 && !level.empty())
@@ -36,7 +33,6 @@ private:
         }
     }
 
-    template<typename T>
     void matchOrder(Order* order, T& book)
     {
         while(order->getLeftOverQty() > 0 && !book.empty())
