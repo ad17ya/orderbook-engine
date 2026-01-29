@@ -7,83 +7,74 @@ namespace OrderBookEngine
 class MatchingEngine
 {
 private:
-    OrderBook* m_OrderBook;
+    OrderBook m_book;
     std::unordered_map<uint64_t, Order*> lookup; // order id to order map
 
-    void matchLevel(Order* incoming, PriceLevel& level, T& book, Iter it)
+    void matchLevel(Order* incoming, PriceLevel& level)
     {
-        while (incoming->getLeftOverQty() > 0 && !level.empty())
+        Order* resting = level.headOrder;
+        while(incoming->m_qty > 0 && resting != nullptr)
         {
-            Order* resting = level.headOrder;
-            uint64_t execs = std::min(incoming->getLeftOverQty(), resting->getLeftOverQty());
+            uint64_t tradedQty = std::min(incoming->m_qty, resting->m_qty);
+            incoming->m_qty -= tradedQty;
+            resting->m_qty -= tradedQty;
 
-            incoming->addExecs(execs);
-            resting->addExecs(execs);
-
-            if (resting->getLeftOverQty() == 0)
+            if (resting->m_qty == 0)
             {
-                level.removeOrder(resting);
-                lookup.erase(resting->getOrderId());
+                Order* toRemove = resting;
+                resting = resting->next;
+                level.removeOrder(toRemove);
+                lookup.erase(toRemove->getOrderId());
             }
         }
+    }
 
-        if (level.empty())
+    void matchBuyOrder(Order* order)
+    {
+        auto& asks = m_book.Asks;
+        while (order->m_qty > 0 && !asks.empty())
         {
-            book.erase(it);
+            auto itr = asks.begin();
+            if (order->m_price < itr->first) break;
+            matchLevel(order, itr->second);
+            if (itr->second.empty())
+                asks.erase(itr);
         }
     }
 
-    void matchOrder(Order* order, T& book)
+    void matchSellOrder(Order* order)
     {
-        while(order->getLeftOverQty() > 0 && !book.empty())
+        auto& bids = m_book.Bids;
+        while (order->m_qty > 0 && !bids.empty())
         {
-            auto it = book.begin();
-            if (!isPriceMatch(order->getSide(), it->first, order->getPrice()))
-                break;
-
-            matchLevel(order, it->second, book, it);
+            auto itr = bids.begin();
+            if (order->m_price > itr->first) break;
+            matchLevel(order, itr->second);
+            if (itr->second.empty())
+                bids.erase(itr);
         }
     }
 
-    void storeOrderToDealBook(Order*) {};
-
-    bool isPriceMatch(enSIDE side, double marketPrice, double orderPrice)
+    void insertOrder(Order* order)
     {
-        if (side == enSIDE::Buy)
-            return orderPrice >= marketPrice;
-        else
-            return orderPrice <= marketPrice;
+        auto& book = Side::Buy == order->m_side ? m_book.Bids : m_book.Asks;
+        book[order->m_price].addOrder(order);
+        lookup[order->m_orderId] = order;
     }
 
 public:
-    MatchingEngine() 
-    {
-        m_OrderBook = std::make_shared<OrderBook>();
-    };
+    MatchingEngine() {};
 
     void onNewOrder(Order* order)
     {
-        // Invalid order
-        if (!order || !order->isValid()) 
-            return;
-
-        // Already received order with same ID
-        auto itr = lookup.find(order->getOrderId());
-        if (itr != lookup.end())
-            return;
-
-        lookup.insert({order->getOrderId(), order});
-        
-        if (order->getSide() == enSIDE::Buy)
-            matchOrder(order, m_OrderBook->Asks);
+        // No validations here, invalid orders should not enter the system
+        if (order->m_side == Side::Buy)
+            matchBuyOrder(order);
         else
-            matchOrder(order, m_OrderBook->Bids);
+            matchSellOrder(order);
 
-        if (!order->isFullyFilled())
-        {
-            // Add remaining order to order book
-            storeOrderToDealBook(order);
-        }
+        if (order->m_qty > 0)
+            insertOrder(order); 
     }
 };
 
