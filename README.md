@@ -1,4 +1,4 @@
-# Low-Latency Order Book & Matching Engine (C++)
+# High-Performance Order Book & Matching Engine (C++)
 
 A deterministic, in-memory limit order book and matching engine implementing **strict price-time priority**.  
 Designed to resemble real **trading-infrastructure cores**, not application-level systems.
@@ -17,12 +17,12 @@ Designed to resemble real **trading-infrastructure cores**, not application-leve
 
 ## Why This Project
 
-This project demonstrates **systems-level thinking** required for trading infrastructure:
+This project demonstrates **systems-level thinking** required for high-performance trading infrastructure:
 
 - Correctness by construction  
 - Deterministic behavior (same input → same output)  
 - Explicit ownership & lifecycle  
-- Hot-path discipline (no locks, no heap, no I/O)  
+- Hot-path discipline (no locks, no heap allocation, no I/O)
 
 ---
 
@@ -54,7 +54,7 @@ This project demonstrates **systems-level thinking** required for trading infras
 4. Partial fills supported
 5. Remaining quantity rests in the book
 
-**Trade price = resting order price**
+**Trade price = resting order’s price**
 
 ---
 
@@ -77,7 +77,7 @@ This project demonstrates **systems-level thinking** required for trading infras
 - ❌ Floating-point arithmetic
 - ❌ Over-engineering
 
-Focus is on **correct core logic**, not features.
+Focus is on **high-performance core logic and correctness**, not features.
 
 ---
 
