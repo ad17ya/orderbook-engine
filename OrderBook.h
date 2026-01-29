@@ -3,7 +3,6 @@
 #include <unordered_map>
 
 #include "PriceLevel.h"
-#include "OrderBook.h"
 
 namespace OrderBookEngine
 {

@@ -19,6 +19,21 @@ private:
             incoming->m_qty -= tradedQty;
             resting->m_qty -= tradedQty;
 
+            uint64_t tradePriceTicks = resting->m_priceTicks;
+            uint64_t buyId  = (incoming->m_side == Side::Buy)
+                                ? incoming->m_orderId
+                                : resting->m_orderId;
+            uint64_t sellId = (incoming->m_side == Side::Sell)
+                                ? incoming->m_orderId
+                                : resting->m_orderId;
+
+            std::cout << "TRADE "
+                << "price=" << tradePriceTicks
+                << " qty=" << tradedQty
+                << " buyID=" << buyId
+                << " sellID=" << sellId
+                << "\n";
+
             if (resting->m_qty == 0)
             {
                 Order* toRemove = resting;
@@ -78,6 +93,33 @@ public:
 
         if (order->m_qty > 0)
             insertOrder(order); 
+    }
+
+    // For debugging
+    void printOrderBook() const
+    {
+        std::cout << "---------------------\n";
+        std::cout << "Order Book:\n";
+        std::cout << "Bids:\n";
+        for (const auto& [price, level] : m_book.Bids)
+        {
+            std::cout << " Price: " << price << " Qty: ";
+            uint64_t totalQty = 0;
+            for (Order* o = level.headOrder; o != nullptr; o = o->next)
+                totalQty += o->m_qty;
+            std::cout << totalQty << "\n";
+        }
+
+        std::cout << "Asks:\n";
+        for (const auto& [price, level] : m_book.Asks)
+        {
+            std::cout << " Price: " << price << " Qty: ";
+            uint64_t totalQty = 0;
+            for (Order* o = level.headOrder; o != nullptr; o = o->next)
+                totalQty += o->m_qty;
+            std::cout << totalQty << "\n";
+        }
+        std::cout << "---------------------\n";
     }
 };
 
