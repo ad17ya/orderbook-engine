@@ -24,7 +24,7 @@ private:
                 Order* toRemove = resting;
                 resting = resting->next;
                 level.removeOrder(toRemove);
-                lookup.erase(toRemove->getOrderId());
+                lookup.erase(toRemove->m_orderId);
             }
         }
     }
@@ -35,7 +35,7 @@ private:
         while (order->m_qty > 0 && !asks.empty())
         {
             auto itr = asks.begin();
-            if (order->m_price < itr->first) break;
+            if (order->m_priceTicks < itr->first) break;
             matchLevel(order, itr->second);
             if (itr->second.empty())
                 asks.erase(itr);
@@ -48,7 +48,7 @@ private:
         while (order->m_qty > 0 && !bids.empty())
         {
             auto itr = bids.begin();
-            if (order->m_price > itr->first) break;
+            if (order->m_priceTicks > itr->first) break;
             matchLevel(order, itr->second);
             if (itr->second.empty())
                 bids.erase(itr);
@@ -57,8 +57,11 @@ private:
 
     void insertOrder(Order* order)
     {
-        auto& book = Side::Buy == order->m_side ? m_book.Bids : m_book.Asks;
-        book[order->m_price].addOrder(order);
+        if (order->m_side == Side::Buy)
+            m_book.Bids[order->m_priceTicks].addOrder(order);
+        else
+            m_book.Asks[order->m_priceTicks].addOrder(order);
+
         lookup[order->m_orderId] = order;
     }
 
